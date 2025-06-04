@@ -1,0 +1,28 @@
+{
+  "name": "hyros-mcp-api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "bin": {
+    "hyros-mcp-api": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "hyros", "n8n", "api", "model-context-protocol"],
+  "author": "Hyros MCP Team",
+  "license": "MIT",
+  "description": "MCP server for Hyros API integration - provides 24 Hyros API tools for AI agents",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "axios": "^1.9.0"
+  },
+  "files": [
+    "server.js",
+    "README.md"
+  ]
+}
