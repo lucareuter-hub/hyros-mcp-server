@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -554,10 +553,38 @@ class HyrosMCPServer {
   }
 
   async run() {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error('Hyros MCP server running on stdio');
-  }
+    const { SSEServerTransport } = await import('@modelcontextprotocol/sdk/server/sse.js');
+    const express = (await import('express')).default;
+
+    const app = express();
+    const port = parseInt(process.env.PORT || '8000', 10);
+
+    // Bearer token protection
+    const secret = process.env.MCP_SECRET_TOKEN;
+    if (secret) {
+        app.use((req, res, next) => {
+            const auth = req.headers['authorization'] || '';
+            if (auth !== `Bearer ${secret}`) {
+                return res.status(401).send('Unauthorized');
+            }
+            next();
+        });
+    }
+
+    app.get('/sse', async (req, res) => {
+        const transport = new SSEServerTransport('/messages', res);
+        await this.server.connect(transport);
+    });
+
+    app.post('/messages', async (req, res) => {
+        // handled by SSEServerTransport
+    });
+
+    app.listen(port, '0.0.0.0', () => {
+        console.error(`Hyros MCP server running on SSE at port ${port}`);
+    });
+}
+
 }
 
 const server = new HyrosMCPServer();
